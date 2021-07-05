@@ -1,8 +1,9 @@
-import {Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver} from "type-graphql";
+import {Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware} from "type-graphql";
 import {hash, compare} from "bcryptjs";
 import { User } from "./entity/User";
-import { MyContext } from "MyContext";
-import { createAccessToken, createRefreshToken } from "../auth";
+import { MyContext } from "./MyContext";
+import { createAccessToken, createRefreshToken } from "./auth";
+import { isAuth } from "./isAuth";
 
 @ObjectType()
 class LoginResponse{
@@ -16,6 +17,12 @@ export class UserResolvers {
     @Query(()=>String)
     hello () {
         return "hi form UserResolvers";
+    }
+
+    @Query(()=>String)
+    @UseMiddleware(isAuth)
+    bye (@Ctx() {payload}:MyContext) {
+        return `your use id is ${payload!.userId}`
     }
 
     @Query(()=>[User])
@@ -52,17 +59,15 @@ export class UserResolvers {
             if(!user){
                 throw new Error("Could not find user");
             }
-            console.log(user)
             const validPassword=await compare(password, user.password);
-            console.log(validPassword);
             if(!validPassword){
                 throw new Error("bad password");
             }
-            res.cookie("jid", createAccessToken(user),{
+            res.cookie("jid", createRefreshToken(user),{
                     httpOnly: true,
             });
             return {
-                accessToken: createRefreshToken(user),
+                accessToken: createAccessToken(user),
             };
     }
 }

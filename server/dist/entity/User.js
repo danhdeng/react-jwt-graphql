@@ -11,26 +11,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
-let User = class User {
+const type_graphql_1 = require("type-graphql");
+let User = class User extends typeorm_1.BaseEntity {
 };
 __decorate([
+    type_graphql_1.Field(() => type_graphql_1.Int),
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column(),
+    type_graphql_1.Field(),
+    typeorm_1.Column("text"),
     __metadata("design:type", String)
-], User.prototype, "firstName", void 0);
+], User.prototype, "email", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column("text"),
     __metadata("design:type", String)
-], User.prototype, "lastName", void 0);
+], User.prototype, "password", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column("int", { default: 0 }),
     __metadata("design:type", Number)
-], User.prototype, "age", void 0);
+], User.prototype, "tokenVersion", void 0);
 User = __decorate([
-    typeorm_1.Entity()
+    type_graphql_1.ObjectType(),
+    typeorm_1.Entity("users")
 ], User);
 exports.User = User;
 //# sourceMappingURL=User.js.map

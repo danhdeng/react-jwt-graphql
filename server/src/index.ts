@@ -14,6 +14,12 @@ import { UserResolvers } from "./userResolvers";
     app.get("/",(_, res)=>{
         res.send("hello from server");
     });
+
+    // to get the refresh token
+    app.post("/refresh_token",req=>{
+      console.log(req.headers);
+    });
+
     await createConnection();
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
