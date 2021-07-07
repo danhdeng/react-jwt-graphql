@@ -21,11 +21,6 @@ import cors from "cors";
       credentials: true
     }));
     app.use(cookieParser());
-    app.use(function(req, res, next) {  
-      res.header('Access-Control-Allow-Origin', req.headers.origin);
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      next();
-    });  
     app.get("/",(_, res)=>{
         res.send("hello from server");
     });
@@ -33,6 +28,7 @@ import cors from "cors";
     // to get the refresh token
     app.post("/refresh_token",async (req,res)=>{
         const token=req.cookies.jid;
+        console.log(token);
         if(!token){
           return res.send({ok: false, accessToken:""});
         }
