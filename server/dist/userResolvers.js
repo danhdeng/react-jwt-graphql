@@ -27,6 +27,8 @@ const bcryptjs_1 = require("bcryptjs");
 const User_1 = require("./entity/User");
 const auth_1 = require("./auth");
 const isAuth_1 = require("./isAuth");
+const sendRefreshToken_1 = require("./sendRefreshToken");
+const typeorm_1 = require("typeorm");
 let LoginResponse = class LoginResponse {
 };
 __decorate([
@@ -40,11 +42,17 @@ let UserResolvers = class UserResolvers {
     hello() {
         return "hi form UserResolvers";
     }
-    bye({ payload }) {
+    accessWithToken({ payload }) {
         return `your use id is ${payload.userId}`;
     }
     users() {
         return User_1.User.find();
+    }
+    revokeRefreshTokenForUser(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield typeorm_1.getConnection().getRepository(User_1.User).increment({ id: userId }, "tokenVersion", 1);
+            return true;
+        });
     }
     register(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -72,11 +80,9 @@ let UserResolvers = class UserResolvers {
             if (!validPassword) {
                 throw new Error("bad password");
             }
-            res.cookie("jid", auth_1.createAccessToken(user), {
-                httpOnly: true,
-            });
+            sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(user));
             return {
-                accessToken: auth_1.createRefreshToken(user),
+                accessToken: auth_1.createAccessToken(user),
             };
         });
     }
@@ -94,13 +100,20 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], UserResolvers.prototype, "bye", null);
+], UserResolvers.prototype, "accessWithToken", null);
 __decorate([
     type_graphql_1.Query(() => [User_1.User]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UserResolvers.prototype, "users", null);
+__decorate([
+    type_graphql_1.Mutation(() => Boolean),
+    __param(0, type_graphql_1.Arg('userId', () => type_graphql_1.Int)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], UserResolvers.prototype, "revokeRefreshTokenForUser", null);
 __decorate([
     type_graphql_1.Mutation(() => Boolean),
     __param(0, type_graphql_1.Arg('email')),

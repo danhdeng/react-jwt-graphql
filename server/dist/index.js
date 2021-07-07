@@ -19,11 +19,45 @@ const express_1 = __importDefault(require("express"));
 const apollo_server_express_1 = require("apollo-server-express");
 const type_graphql_1 = require("type-graphql");
 const userResolvers_1 = require("./userResolvers");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const jsonwebtoken_1 = require("jsonwebtoken");
+const User_1 = require("./entity/User");
+const auth_1 = require("./auth");
+const sendRefreshToken_1 = require("./sendRefreshToken");
+const cors_1 = __importDefault(require("cors"));
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const app = express_1.default();
+    app.use(cors_1.default({
+        origin: "http://localhost:3000",
+        credentials: true
+    }));
+    app.use(cookie_parser_1.default());
     app.get("/", (_, res) => {
         res.send("hello from server");
     });
+    app.post("/refresh_token", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const token = req.cookies.jid;
+        if (!token) {
+            return res.send({ ok: false, accessToken: "" });
+        }
+        let payload = null;
+        try {
+            payload = jsonwebtoken_1.verify(token, process.env.REFRESH_TOKEN_SECRET);
+        }
+        catch (err) {
+            console.log(err);
+            return res.send({ ok: false, accessToken: "" });
+        }
+        const user = yield User_1.User.findOne({ id: payload.userId });
+        if (!user) {
+            return res.send({ ok: false, accessToken: "" });
+        }
+        if (user.tokenVersion !== payload.tokenVersion) {
+            return res.send({ ok: false, accessToken: "" });
+        }
+        sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(user));
+        return res.send({ ok: true, accessToken: auth_1.createAccessToken(user) });
+    }));
     yield typeorm_1.createConnection();
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
@@ -31,7 +65,7 @@ const userResolvers_1 = require("./userResolvers");
         }),
         context: ({ req, res }) => ({ req, res })
     });
-    apolloServer.applyMiddleware({ app });
+    apolloServer.applyMiddleware({ app, cors: false });
     app.listen(4000, () => {
         console.log("express server started at port: 4000");
     });

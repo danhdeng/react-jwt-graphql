@@ -1,15 +1,27 @@
-import React from 'react';
-import { useHelloQuery } from './generated/graphql';
+// import axios from 'axios';
+import React, { useState,useEffect } from 'react';
+import { setAccessToken } from './accessToken';
+import { Routes } from './Routes';
 
 function App() {
-  const {data, loading}=useHelloQuery();
+  const [loading,setLoading]=useState(true);
 
-  if(loading || !data){
-    return <p>loading...</p>
+  useEffect(() => {
+    fetch("http://localhost:4000/refresh_token", {
+      method: "POST",
+      credentials: "include",
+    }).then(async x => {
+      const { accessToken } = await x.json();
+      setAccessToken(accessToken);
+      setLoading(false);
+    });
+  }, []);
+  if(loading){
+    return <div>loading...</div>
   }
   return (
     <div className="App">
-      data from {data.hello}
+      <Routes />
     </div>
   );
 }

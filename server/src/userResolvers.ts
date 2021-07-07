@@ -23,7 +23,7 @@ export class UserResolvers {
 
     @Query(()=>String)
     @UseMiddleware(isAuth)
-    bye (@Ctx() {payload}:MyContext) {
+    accessWithToken (@Ctx() {payload}:MyContext) {
         return `your use id is ${payload!.userId}`
     }
 
@@ -74,6 +74,8 @@ export class UserResolvers {
                 throw new Error("bad password");
             }
             sendRefreshToken(res,createRefreshToken(user));
+            //res.cookie('rememberme', '1', { expires: new Date(Date.now() + 900000), httpOnly: true });
+            //res.cookie("jid", createRefreshToken(user), { expires: new Date(Date.now() + 900000), httpOnly: true });
             return {
                 accessToken: createAccessToken(user),
             };
