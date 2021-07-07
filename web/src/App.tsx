@@ -7,7 +7,6 @@ function App() {
   const [loading,setLoading]=useState(true);
 
   useEffect(() => {
-    console.log("try to refresh token");
     fetch("http://localhost:4000/refresh_token", {
       method: "POST",
       credentials: "include",

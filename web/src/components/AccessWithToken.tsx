@@ -2,7 +2,7 @@ import React from 'react'
 import { useAccessWithTokenQuery } from '../generated/graphql'
 
 export default function AccessWithToken() {
-    const {data, loading, error}=useAccessWithTokenQuery();
+    const {data, loading, error}=useAccessWithTokenQuery({fetchPolicy: "network-only"});
 
     if(loading){
         return <div>loading...</div>

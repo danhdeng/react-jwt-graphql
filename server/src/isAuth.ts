@@ -4,7 +4,8 @@ import { MiddlewareFn } from "type-graphql";
 
 export const isAuth: MiddlewareFn<MyContext>=({context}, next)=>{
     let token;
-    if(context.req.headers.authorization && context.req.headers.authorization.startsWith("Bearer")){
+    console.log("req auth: ", context.req.headers.authorization);
+    if(context.req.headers.authorization && context.req.headers.authorization.startsWith("bearer")){
         token=context.req.headers.authorization.split(" ")[1];
     }
     if(!token){
