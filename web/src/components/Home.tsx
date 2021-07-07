@@ -3,7 +3,6 @@ import { useUsersQuery } from '../generated/graphql'
 
 export default function Home() {
     const {data,} =useUsersQuery({fetchPolicy: "cache-and-network"});
-
     if(!data){
         return <div>loading....</div>
     }

@@ -6,6 +6,7 @@ import { createAccessToken, createRefreshToken } from "./auth";
 import { isAuth } from "./isAuth";
 import { sendRefreshToken } from "./sendRefreshToken";
 import { getConnection } from "typeorm";
+import { verify } from "jsonwebtoken";
 
 @ObjectType()
 class LoginResponse{
@@ -28,9 +29,32 @@ export class UserResolvers {
     }
 
     @Query(()=>[User])
-    users () {
-        return User.find();
+    async users () {
+        return await User.find();
     }
+
+    @Query(()=>User, {nullable: true})
+    async me (@Ctx() context: MyContext
+    ) {
+        let token;
+        if(context.req.headers.authorization && context.req.headers.authorization.startsWith("bearer")){
+            token=context.req.headers.authorization.split(" ")[1];
+        }
+        if(!token){
+            return null;
+       }
+    
+        try{
+            const payload: any=verify(token, process.env.ACCESS_TOKEN_SECRET!);
+            return await User.findOne(payload.userId);
+        }
+        catch(err){
+            console.log("error:", err);
+            return null;
+        }
+        return null;
+    }
+
 
     @Mutation(()=>Boolean)
     async revokeRefreshTokenForUser(
