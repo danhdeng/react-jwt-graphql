@@ -1,5 +1,5 @@
 import React from 'react'
-import {BrowserRouter, Link, Route, Switch} from "react-router-dom";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 import AccessWithToken from './components/AccessWithToken';
 import Header from './components/Header';
 import Home from './components/Home';

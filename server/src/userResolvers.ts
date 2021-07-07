@@ -11,7 +11,10 @@ import { verify } from "jsonwebtoken";
 @ObjectType()
 class LoginResponse{
     @Field()
-    accessToken: string
+    accessToken: string;
+
+    @Field(()=>User)
+    user: User;
 }
 
 
@@ -65,6 +68,13 @@ export class UserResolvers {
     }
 
     @Mutation(()=>Boolean)
+    async logout(@Ctx() {res}: MyContext
+    ) {
+        sendRefreshToken(res,"");
+        return true;
+    }
+
+    @Mutation(()=>Boolean)
     async register(
         @Arg('email') email: string,
         @Arg('password') password: string,
@@ -101,7 +111,7 @@ export class UserResolvers {
             // res.cookie('rememberme', '1', { expires: new Date(Date.now() + 900000), httpOnly: true });
             //res.cookie("jid", createRefreshToken(user), { expires: new Date(Date.now() + 900000), httpOnly: true });
             return {
-                accessToken: createAccessToken(user),
+                accessToken: createAccessToken(user), user
             };
     }
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {ApolloClient, InMemoryCache, ApolloProvider, createHttpLink, ApolloLink, HttpLink, Observable} from "@apollo/client";
-import { setContext } from '@apollo/client/link/context';
+import {ApolloClient, InMemoryCache, ApolloProvider, ApolloLink, HttpLink, Observable} from "@apollo/client";
 import { getAccessToken, setAccessToken } from './accessToken';
 import App from './App';
 
@@ -13,7 +12,6 @@ const tokenRefreshLink: any= new TokenRefreshLink({
   accessTokenField: "accessToken",
   isTokenValidOrUndefined: () => {
     const token = getAccessToken();
-    console.log("token ",token);
     if (!token) {
       return true;
     }
