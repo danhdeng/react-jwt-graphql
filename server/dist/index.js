@@ -63,7 +63,9 @@ const cors_1 = __importDefault(require("cors"));
         schema: yield type_graphql_1.buildSchema({
             resolvers: [userResolvers_1.UserResolvers]
         }),
-        context: ({ req, res }) => ({ req, res })
+        context: ({ req, res }) => ({ req, res }),
+        introspection: false,
+        playground: false,
     });
     apolloServer.applyMiddleware({ app, cors: false });
     app.listen(4000, () => {

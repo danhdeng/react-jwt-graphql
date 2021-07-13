@@ -57,7 +57,9 @@ import cors from "cors";
         schema: await buildSchema({
           resolvers: [UserResolvers]
         }),
-        context: ({ req, res }) => ({ req, res })
+        context: ({ req, res }) => ({ req, res }),
+        introspection: process.env.DEV_ENV==="development",
+        playground: process.env.DEV_ENV==="development",
       });
     
     apolloServer.applyMiddleware({app, cors: false});
